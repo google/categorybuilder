@@ -15,13 +15,21 @@ cd categorybuilder
 git lfs pull
 ```
 
+## Initialization
+
+_Note: This will take a few minutes to initalize. Two files totaling 7 GB are produced._
+
+``` shell
+python initialize.py
+```
+
 ## How to use Category Builder
-_Note: The first time you run this command it will take a few minutes to initalize. Two files totaling 5GB are produced, and subsequent runs are nearly instantaneous._
 
 ``` shell
 python category_builder.py ford nixon
 python category_builder.py --rho=2 --n=20 ford chevy
 ```
+
 The seeds to expand are provided on the command line as positional arguments and should be lowercase. Compound names (e.g., "New York") should be quoted.
 
 ``` shell

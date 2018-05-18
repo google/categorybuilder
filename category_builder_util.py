@@ -19,6 +19,7 @@ import io
 import itertools
 import os.path
 import shelve
+import sys
 
 DATA_DIR = '.'
 
@@ -34,13 +35,34 @@ F_TO_I_SHELF = 'f-to-i-shelf'
 def GetPath(filename):
   return os.path.join(DATA_DIR, filename)
 
-def CreateShelf(infile, outfile):
+def CreateShelf(infile, outfile, linecount, verbose):
   """Convert a CSV file to a shelf keyed by the first column.
   
   This is a no-op if outfile exists.
   """
+  if verbose:
+    print "Checking if we need to produce '%s' from '%s'" % (outfile, infile)
   if os.path.exists(outfile):
+    # We are probably fine, but check size just to be sure.
+    output_size = os.path.getsize(outfile)
+    if verbose:
+      print "\tSize of %s: %d" % (outfile, output_size)
+    if output_size < 500000000:
+      print "The file $s seems too small, likely corrupted. Please delete it rerun initialize.py." % outfile
+      sys.exit(1)
+    if verbose:
+      print "\tLooks good."
     return
+
+  if verbose:
+    print "Processing '%s'. This may take a couple of minutes." % infile
+
+  input_size = os.path.getsize(infile)
+  if input_size < 500000000:
+    print "The file $s seems too small." % outfile
+    print "Did you run 'git lfs pull'? Git stores large files differently."
+    sys.exit(1)
+
   s = shelve.open(outfile)
   with bz2.BZ2File(infile) as f:
     linenum = 0
@@ -53,13 +75,15 @@ def CreateShelf(infile, outfile):
       s[key] = rest.strip()
       linenum = linenum + 1
       if linenum % 10000 == 0:
-        print "Creating shelf. Processed ", linenum, " lines"
+        print "\tCreating shelf. Processed %s lines out of %s" % (linenum, linecount)
   s.close()
 
-def CreateShelves():
+def CreateShelves(verbose=False):
   """Create shelves for the two matrices."""
-  CreateShelf(GetPath(I_TO_F_INPUT), GetPath(I_TO_F_SHELF))
-  CreateShelf(GetPath(F_TO_I_INPUT), GetPath(F_TO_I_SHELF))
+  if verbose:
+    print "Initializing two matrices."
+  CreateShelf(GetPath(I_TO_F_INPUT), GetPath(I_TO_F_SHELF), linecount=200000, verbose=verbose)
+  CreateShelf(GetPath(F_TO_I_INPUT), GetPath(F_TO_I_SHELF), linecount=1150000, verbose=verbose)
 
 def GetRow(shelf, key):
   try:
