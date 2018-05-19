@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import print_function
 import argparse
 import category_builder_util as util
 
@@ -29,4 +31,4 @@ if __name__ == "__main__":
   
   items = CB.DoAnalogy(b=args.b, c=args.c, squash=args.squash)
   for item in items[:10]:
-    print item[1], "\t", item[0]
+    print(item[1], "\t", item[0])

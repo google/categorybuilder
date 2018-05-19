@@ -15,6 +15,7 @@
 # This file initializes Category Builder.
 # It produces two files totaling about 5 GB.
 
+from __future__ import absolute_import
 import category_builder_util as util
 
 if __name__ == "__main__":
