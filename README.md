@@ -59,4 +59,27 @@ The same system can solve analogies such as "What is the mount everest of africa
 ``` shell
 python analogy.py "mount everest" africa
 ```
+Note that these are harder than "proportional" analogies such as "hand:glove::foot:?". People don't need to be provided the first term ("hand") and can answer "What is the glove for a foot?"
+
+### Example Output
+
+The items are labeled B and C because analogies are often shown as A:B::C:D.
+
+|  B   | C | What is the B of C? |
+|:----|:-----|:---------------------------|
+|mount everest|africa| kilimanjaro|
+|mount everest|alaska| denali|
+|glove | foot | shoe |
+|darwin | physics | einstein |
+|corolla|honda|honda civic|
+|sacramento|indiana|indianapolis|
+|dollar|india|rupee|
+|football|india|cricket|
+|voldemort|tolkien|sauron|
+|voldemort|star wars|vader|
+|tolkien|voldemort|rowling|
+
+
+
+
 
