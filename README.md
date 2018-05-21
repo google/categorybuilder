@@ -36,11 +36,16 @@ The seeds to expand are provided on the command line as positional arguments and
 python category_builder.py chicago "new york"
 ```
 
-### More examples to try
+### Example Output
 
-* ford stallone
-* cancer diabetes
-* cancer taurus
+| Seeds   | Expansion |
+| :------- | :----------|
+|ford, nixon | nixon, obama, bush, johnson, clinton, ford, reagan, ... |
+|ford, chevy | ford, chevy, toyota, chevrolet, honda, bmw, nissan, ... |
+|ford,  stallone| ford, stallone, khan, kapoor, sylvester stallone, depp, tom cruise, ... |
+|cancer, diabetes| cancer, diabetes, disease, asthama, infection, breast cancer, syndrome, ...|
+|cancer, taurus| virgo, pisces, libra, taurus, scorpio, saggitarius, cancer, aries, capricorn, aquarius, gemini, leo, ...||
+
 
 
 ## How to do analogies
