@@ -44,8 +44,12 @@ python category_builder.py chicago "new york"
 |ford, chevy | ford, chevy, toyota, chevrolet, honda, bmw, nissan, ... |
 |ford,  stallone| ford, stallone, khan, kapoor, sylvester stallone, depp, tom cruise, ... |
 |cancer, diabetes| cancer, diabetes, disease, asthama, infection, breast cancer, syndrome, ...|
-|cancer, taurus| virgo, pisces, libra, taurus, scorpio, saggitarius, cancer, aries, capricorn, aquarius, gemini, leo, ...||
-
+|cancer, taurus| virgo, pisces, libra, taurus, scorpio, saggitarius, cancer, aries, capricorn, aquarius, gemini, leo, ...|
+|safari, trip|trip, tour, trips, safari, vacation, adventure, holiday, excursion, cruisetours, journey, ...|
+|safari, ie|firefox, internet explorer, chrome, explorer, safari, ie, google chrome, browsers, web browser, ...|
+|beautiful, serene|beautiful, serene, peaceful, tranquil, picturesque, quite, lovely, stunning, scenic, secluded, ...|
+|beautiful, poignant| beautiful, poignant, romantic, evocative, gorgeous, poetic, haunting, funny, sad, vivid, ...|
+|beautiful, chic|elegant, chic, stylish, beautiful, gorgeous, stunning, trendy, lovely, vintage, classy, sleek, ...|
 
 
 ## How to do analogies
