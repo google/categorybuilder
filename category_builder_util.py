@@ -48,7 +48,7 @@ def CreateShelf(infile, outfile, linecount, verbose):
     if verbose:
       print "\tSize of %s: %d" % (outfile, output_size)
     if output_size < 500000000:
-      print "The file $s seems too small, likely corrupted. Please delete it rerun initialize.py." % outfile
+      print "The file %s seems too small, likely corrupted. Please delete it rerun initialize.py." % outfile
       sys.exit(1)
     if verbose:
       print "\tLooks good."
@@ -59,7 +59,7 @@ def CreateShelf(infile, outfile, linecount, verbose):
 
   input_size = os.path.getsize(infile)
   if input_size < 500000000:
-    print "The file $s seems too small." % outfile
+    print "The file %s seems too small." % outfile
     print "Did you run 'git lfs pull'? Git stores large files differently."
     sys.exit(1)
 
