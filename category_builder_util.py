@@ -15,6 +15,7 @@
 from collections import defaultdict
 import bz2
 import csv
+import glob
 import io
 import itertools
 import os.path
@@ -35,6 +36,24 @@ F_TO_I_SHELF = 'f-to-i-shelf'
 def GetPath(filename):
   return os.path.join(DATA_DIR, filename)
 
+def DoesShelfExist(shelfname, min_size):
+  """Checks if shelf exists and that it is big enough.
+
+     A complexity arises from the fact that different systems name shelves differently (some
+     add a suffix such as .dat). We thus check for any file with name shelfname or a file with
+     shelfname as the prefix.
+
+     Returns: a two tuple (any good file?, any file with_name?)
+  """
+  any_file_seen = False
+  for f in glob.glob('%s*' % shelfname):
+    any_file_seen = True
+    # We are probably fine, but check size just to be sure.
+    output_size = os.path.getsize(f)
+    if output_size >= min_size:
+      return (True, True)
+  return (False, any_file_seen)
+
 def CreateShelf(infile, outfile, linecount, verbose):
   """Convert a CSV file to a shelf keyed by the first column.
   
@@ -42,17 +61,15 @@ def CreateShelf(infile, outfile, linecount, verbose):
   """
   if verbose:
     print "Checking if we need to produce '%s' from '%s'" % (outfile, infile)
-  if os.path.exists(outfile):
-    # We are probably fine, but check size just to be sure.
-    output_size = os.path.getsize(outfile)
-    if verbose:
-      print "\tSize of %s: %d" % (outfile, output_size)
-    if output_size < 500000000:
-      print "The file %s seems too small, likely corrupted. Please delete it rerun initialize.py." % outfile
-      sys.exit(1)
+ 
+  good_file_seen, any_file_seen = DoesShelfExist(outfile, 500000000)
+  if good_file_seen:
     if verbose:
       print "\tLooks good."
     return
+  elif any_file_seen:
+    print "The file(s) with prefix %s seem too small, likely corrupted. Please delete it rerun initialize.py." % outfile
+    sys.exit(1)
 
   if verbose:
     print "Processing '%s'. This may take a couple of minutes." % infile
