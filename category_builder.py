@@ -20,6 +20,8 @@ def GetArgumentParser():
   parser.add_argument('--rho', default=3.0, type=float, help="The rho param")
   parser.add_argument('--n', default=100, type=int,
                       help="How many features to use")
+  parser.add_argument('--expansion_size', default=100, type=int,
+                      help="How many items to expand to")
   parser.add_argument('--cutpaste', dest='cutpaste', action='store_true',
                       help='Prints output in a formay easy to cut-paster')
   parser.set_defaults(cutpaste=False)
@@ -35,7 +37,7 @@ if __name__ == "__main__":
                             rho=args.rho,
                             n=args.n)
   if args.cutpaste:
-    print ', '.join(item[0] for item in items[:50])
+    print ', '.join(item[0] for item in items[:args.expansion_size])
   else:
-    for idx, item in enumerate(items[:100]):
+    for idx, item in enumerate(items[:args.expansion_size]):
       print "[%d] %f\t%s" % (idx, item[1], item[0])
