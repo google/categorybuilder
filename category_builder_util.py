@@ -185,9 +185,12 @@ class CategoryBuilder(object):
                           wtd_seeds=sorted_contexts,
                           rho=0)
   
-  def DoAnalogy(self, b, c, squash):
+  def DoAnalogy(self, b, c, squash, semantic_n=100):
     print "Looking for the ", b, " of the ", c
     
-    things_like_b = self.ExpandCategory(seeds=[b,], rho=1, n=100)
+    # Since we have a single seed, the exact value of rho does not matter.
+    # This is so because we multiply the weight sum by fraction ^ rho, and
+    # fraction with a single seed can only ever be 0 or 1.
+    things_like_b = self.ExpandCategory(seeds=[b,], rho=1, n=semantic_n) 
     things_cooccuring_with_c = self.GetCooccurringItems(seed=c)
     return MergeScores(things_like_b, things_cooccuring_with_c, squash=squash)
