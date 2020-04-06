@@ -24,16 +24,14 @@ def CleanString(inp):
 
 def GetExpansionCBGivenQuery(seeds, rho, n):
   arguments = [
-    'python', 'category_builder.py', '--cutpaste',
+    'python3', 'category_builder.py', '--cutpaste',
     '--n', str(n), '--rho', str(rho), '--expansion_size', '500'
   ]
   for seed in seeds:
     arguments.append('\'%s\'' % seed)
   arguments = shlex.split(' '.join(arguments))
-  # print arguments
   expansion = subprocess.check_output(arguments,
                                       universal_newlines=True).strip().split(', ')
-  # print expansion
   return expansion
 
 def GetExpansion(seeds, rho, n):
@@ -52,6 +50,7 @@ def EvaluateOneList(item_to_index, expansion, synsets_to_seek):
   for idx, item in enumerate(expansion):
     if CleanString(item) not in item_to_index:
       bad_entries_count = bad_entries_count + 1
+      # The badness of an intrusion is the fraction of correct entries that are yet to be seen.
       intrusion_badness = 1.0 * (synsets_to_seek - len(seen_indices)) / synsets_to_seek
       intrusions.append((item, '#%d' % (idx + 1), intrusion_badness))
     else:
