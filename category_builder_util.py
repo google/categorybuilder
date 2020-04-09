@@ -60,45 +60,47 @@ def CreateShelf(infile, outfile, linecount, verbose):
   This is a no-op if outfile exists.
   """
   if verbose:
-    print "Checking if we need to produce '%s' from '%s'" % (outfile, infile)
- 
+    print(f"Checking if we need to produce '{outfile}' from '{infile}'")
+
   good_file_seen, any_file_seen = DoesShelfExist(outfile, 500000000)
   if good_file_seen:
     if verbose:
-      print "\tLooks good."
+      print(f"\tLooks good.")
     return
   elif any_file_seen:
-    print "The file(s) with prefix %s seem too small, likely corrupted. Please delete it rerun initialize.py." % outfile
+    print(f"The file(s) with prefix {outfile} seem too small, likely corrupted. Please delete it rerun initialize.py.")
     sys.exit(1)
 
   if verbose:
-    print "Processing '%s'. This may take a couple of minutes." % infile
+    print(f"Processing '{infile}'. This may take a few minutes.")
 
   input_size = os.path.getsize(infile)
   if input_size < 500000000:
-    print "The file %s seems too small." % outfile
-    print "Did you run 'git lfs pull'? Git stores large files differently."
+    print(f"The file {outfile} seems too small.")
+    print(f"Did you run 'git lfs pull'? Git stores large files differently.")
     sys.exit(1)
 
   s = shelve.open(outfile)
   with bz2.BZ2File(infile) as f:
     linenum = 0
-    csvreader = csv.reader(f)
+    csvreader = csv.reader(map((lambda x: x.decode('utf-8')), f))
     for line in csvreader:
-      output = io.BytesIO()
+      if len(line) % 2 == 0:
+        print(f'Malformed line: >>{line}<<')
+      output = io.StringIO()
       writer = csv.writer(output)
       writer.writerow(line[1:])
       key, rest = line[0], output.getvalue()
       s[key] = rest.strip()
       linenum = linenum + 1
       if linenum % 10000 == 0:
-        print "\tCreating shelf. Processed %s lines out of %s" % (linenum, linecount)
+        print(f"\tCreating shelf. Processed {linenum:,} lines out of {linecount:,}")
   s.close()
 
 def CreateShelves(verbose=False):
   """Create shelves for the two matrices."""
   if verbose:
-    print "Initializing two matrices."
+    print("Initializing two matrices.")
   CreateShelf(GetPath(I_TO_F_INPUT), GetPath(I_TO_F_SHELF), linecount=200000, verbose=verbose)
   CreateShelf(GetPath(F_TO_I_INPUT), GetPath(F_TO_I_SHELF), linecount=1150000, verbose=verbose)
 
@@ -108,17 +110,17 @@ def GetRow(shelf, key):
   except KeyError:
     return dict()
   
-  pieces = csv.reader([row_string]).next()
+  pieces = next(csv.reader([row_string]))
   iterators = [iter(pieces)] * 2
   grouped = [(p[0], float(p[1]) / 100)
-             for p in itertools.izip_longest(*iterators)]
+             for p in itertools.zip_longest(*iterators)]
   return dict(grouped)
 
 def RestrictToSyntactic(looked_up_row):
-  return dict(p for p in looked_up_row.iteritems() if p[0][0] == 'S')
+  return dict(p for p in looked_up_row.items() if p[0][0] == 'S')
 
 def RestrictToCooc(looked_up_row):
-  return dict(p for p in looked_up_row.iteritems() if p[0][0] == 'C')
+  return dict(p for p in looked_up_row.items() if p[0][0] == 'C')
 
 def MatrixMultiply(shelf, wtd_seeds, rho=0, filterfn=None):
   each_seed_fraction = 1.0 / len(wtd_seeds)
@@ -130,12 +132,12 @@ def MatrixMultiply(shelf, wtd_seeds, rho=0, filterfn=None):
       contexts_for_s = filterfn(unfiltered_row)
     else:
       contexts_for_s = unfiltered_row
-    for c, wt in contexts_for_s.iteritems():
+    for c, wt in contexts_for_s.items():
       context_fraction[c] += each_seed_fraction
       context_weight[c] += seed_wt * wt
   
   # Now we penalize contexts not seen with all items.
-  for context, fraction in context_fraction.iteritems():
+  for context, fraction in context_fraction.items():
     context_weight[context] *= pow(fraction, rho)
   sorted_contexts = sorted(context_weight.items(), reverse=True,
                            key=lambda x: x[1])
@@ -167,7 +169,7 @@ class CategoryBuilder(object):
                                      rho=rho,
                                      filterfn=RestrictToSyntactic)
     if not sorted_contexts:
-      print "Did not find any contexts for ", seeds
+      print(f"Did not find any contexts for {seeds}")
       return []
     return MatrixMultiply(shelf=self.FToI,
                           wtd_seeds=sorted_contexts[:n],
@@ -179,14 +181,14 @@ class CategoryBuilder(object):
                                      rho=0,
                                      filterfn=RestrictToCooc)
     if not sorted_contexts:
-      print "Did not find any contexts for ", seed
+      print(f"Did not find any contexts for '{seed}'")
       return []
     return MatrixMultiply(shelf=self.FToI,
                           wtd_seeds=sorted_contexts,
                           rho=0)
   
   def DoAnalogy(self, b, c, squash, semantic_n=100):
-    print "Looking for the ", b, " of the ", c
+    print(f"Looking for the '{b}' of the '{c}'")
     
     # Since we have a single seed, the exact value of rho does not matter.
     # This is so because we multiply the weight sum by fraction ^ rho, and

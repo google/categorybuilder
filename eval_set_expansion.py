@@ -48,10 +48,8 @@ class CategoryEvalMAP(object):
             self.item_to_index[p] = next_index
             self.item_to_index[CleanString(p)] = next_index
           next_index = next_index + 1
-    print self.item_to_index
-          
 
-    
+
   def Eval(self, num_iterations, seeds_in_top_n, map_n, rho, n):
     effective_seeds = self.candidate_seeds
     if seeds_in_top_n > 0:
@@ -59,7 +57,7 @@ class CategoryEvalMAP(object):
     synsets_to_seek = map_n
     if not synsets_to_seek:
       synsets_to_seek = len(effective_seeds)
-    print "SEEDS TO SELECT FROM: ", effective_seeds
+    print(f"SEEDS TO SELECT FROM: {effective_seeds}")
     
     # An intruder is a bad item in the expansion that comes before good ones.
     # Baddness is the fraction of sysnsets before which it occurs: for U.S states,
@@ -74,15 +72,17 @@ class CategoryEvalMAP(object):
       score_here, intrusions = EvaluateOneList(self.item_to_index, expansion, synsets_to_seek)
       for intrusion, position, badness in intrusions:
         intrusions_by_badness[intrusion] += badness
-      print "\nITERATION #%d: " % itercount, seeds, '==> Mean precision: ', score_here
-      print "\tTop Intrusions: ", intrusions[:20]
+      print(f"\nITERATION #{itercount}: {seeds} ==> Mean precision: {score_here}")
+      print(f"\tTop Intrusions: {intrusions[:20]}")
       score_sum += score_here
     
-    print "\n\nTop Intrusions:\n"
-    for intrusion, badness in sorted(intrusions_by_badness.items(), reverse=True, key=lambda x: x[1])[:20]:
-      print "\t", badness / num_iterations, intrusion
+    print("\n\nTop Intrusions (a score of 3% here means that this entry was typically seen after 97% of the real entries):\n")
+    for intrusion, badness in sorted(intrusions_by_badness.items(),
+                                     reverse=True,
+                                     key=lambda x: x[1])[:20]:
+      print(f"\t{100.0 * badness / num_iterations:5.3f}%\t{intrusion}")
 
-    print "\n\nMAP score: ", score_sum / num_iterations
+    print(f"\n\nMAP score: {100.0 * score_sum / num_iterations: 5.3f}%")
       
   
 
@@ -101,6 +101,6 @@ if __name__ == '__main__':
   
   eval_category = CategoryEvalMAP(flags.filename)
   eval_category.Eval(num_iterations=flags.iterations,
-  	             seeds_in_top_n=flags.seeds_in_top_n,
-  	             map_n=flags.map_n, rho=flags.rho, n=flags.n)
+    	             seeds_in_top_n=flags.seeds_in_top_n,
+    	             map_n=flags.map_n, rho=flags.rho, n=flags.n)
 

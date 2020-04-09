@@ -54,7 +54,7 @@ def EvaluateAnalogies(CB, catname, fourtuples, rho, n, squash, reverse,
   effective_catname = catname
   if reverse:
     effective_catname = effective_catname + " REVERSE"
-  print "\n\n=========  ", effective_catname, " ============\n\n"
+  print(f"\n\n=========  {effective_catname} ============\n\n")
   correct_at_pos = defaultdict(int)
   for tuple_number, fourtuple in enumerate(fourtuples):
     if reverse:
@@ -70,29 +70,29 @@ def EvaluateAnalogies(CB, catname, fourtuples, rho, n, squash, reverse,
     for idx, item in enumerate(expansion):
       if item[0] == pair_2["rhs"]:
         # We have a hit!
-        print "%s : %s :: %s : %s Solved at position %d %s" % (
+        print("%s : %s :: %s : %s Solved at position %d %s" % (
             pair_1["lhs"],
             pair_1["rhs"],
             pair_2["lhs"],
             pair_2["rhs"],
             len(incorrect_seen),
-            (' AFTER: ' + '; '.join(incorrect_seen[:10]) if incorrect_seen else ''))
+            (' AFTER: ' + '; '.join(incorrect_seen[:10]) if incorrect_seen else '')))
         for i in range(len(incorrect_seen) + 1, 26):
           correct_at_pos[i] = correct_at_pos[i] + 1
-        print "\tCurrent Precision: ", 1.0 * correct_at_pos[1] / (tuple_number + 1)
+        print("\tCurrent Precision: ", 1.0 * correct_at_pos[1] / (tuple_number + 1))
         solved = True
         break
       else:
         if item[0] != pair_1["rhs"] and item[0] != pair_2["lhs"]:
           incorrect_seen.append(item[0])
     if not solved:
-      print "#### FAILED: %s : %s :: %s : %s" % (pair_1["lhs"],
+      print("#### FAILED: %s : %s :: %s : %s" % (pair_1["lhs"],
                                                  pair_1["rhs"],
                                                  pair_2["lhs"],
-                                                 pair_2["rhs"])
-  print "====================================="
-  print "CORRECTNESS By Index for ", effective_catname, correct_at_pos
-  print "ACCURACY FOR ", effective_catname, "\tplain_ppmi=", use_plain_ppmi, "\t", 1.0 * correct_at_pos[1] / len(fourtuples)
+                                                 pair_2["rhs"]))
+  print("=====================================")
+  print("CORRECTNESS By Index for ", effective_catname, correct_at_pos)
+  print(f"ACCURACY FOR {effective_catname}:\t {1.0 * correct_at_pos[1] / len(fourtuples)}")
 
 
 if __name__ == '__main__':
@@ -112,7 +112,7 @@ if __name__ == '__main__':
   for catname, fourtuples in data.items():
     random.shuffle(fourtuples)
     if catname.startswith('gram') and not catname.startswith('gram6'):
-      print "SKIPPING ", catname
+      print("SKIPPING ", catname)
       continue
     EvaluateAnalogies(CB, catname, fourtuples, rho=flags.rho, n=flags.n, squash=flags.squash, reverse=True,
                       semantic_n=flags.semantic_n)

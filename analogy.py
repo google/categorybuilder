@@ -29,4 +29,4 @@ if __name__ == "__main__":
   
   items = CB.DoAnalogy(b=args.b, c=args.c, squash=args.squash)
   for item in items[:10]:
-    print item[1], "\t", item[0]
+    print(f"{item[1]:5.3f}\t\t{item[0]}")
