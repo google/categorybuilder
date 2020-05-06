@@ -18,7 +18,7 @@
 import category_builder_util as util
 
 if __name__ == "__main__":
-  util.CreateShelves(True)
+  util.create_db(data_dir=".")
 
 
 
