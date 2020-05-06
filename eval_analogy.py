@@ -106,7 +106,7 @@ if __name__ == '__main__':
   parser.add_argument('filename', type=str, help='File containing eval data')
   flags = parser.parse_args()
 
-  CB = util.CategoryBuilder()
+  CB = util.CategoryBuilder(data_dir='.')
 
   data = ReadData(flags.filename)
   for catname, fourtuples in data.items():
