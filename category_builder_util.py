@@ -48,7 +48,7 @@ def process_bz2file_into_db(infile, table_name, cursor, connection, expected_siz
                 bar()
 
 
-def create_db(data_dir, verbose):
+def create_db(data_dir, verbose=False):
     """Convert a pair of CSV files to a sqlite3 database.
   
       This is a no-op if outfile exists.

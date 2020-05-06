@@ -2,4 +2,4 @@
 *.pyc
 .idea
 cb.db
-
+cb.db-journal
