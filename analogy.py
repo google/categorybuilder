@@ -25,7 +25,7 @@ def GetArgumentParser():
 if __name__ == "__main__":
   args = GetArgumentParser().parse_args()
 
-  CB = util.CategoryBuilder()
+  CB = util.CategoryBuilder(data_dir=".")
   
   items = CB.DoAnalogy(b=args.b, c=args.c, squash=args.squash)
   for item in items[:10]:

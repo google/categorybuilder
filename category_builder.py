@@ -28,10 +28,11 @@ def GetArgumentParser():
   parser.add_argument('seeds', nargs='+', help="Seeds to expand")
   return parser
 
+
 if __name__ == "__main__":
   args = GetArgumentParser().parse_args()
 
-  CB = util.CategoryBuilder()
+  CB = util.CategoryBuilder(data_dir=".")
   
   items = CB.ExpandCategory(seeds=args.seeds,
                             rho=args.rho,

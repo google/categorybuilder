@@ -17,7 +17,9 @@ git lfs pull
 
 ## Initialization
 
-_Note: This will take a few minutes to initalize. Two files totaling 7 GB are produced._
+_Note: This will take a few minutes to initalize. An sqlite database of about 5.2 GB is produced._
+
+_Note: The initialization uses alive_progress to show progress. You can get it by 'pip3 install alive_progress'._
 
 ``` shell
 python initialize.py
@@ -79,7 +81,13 @@ The items are labeled B and C because analogies are often shown as A:B::C:D.
 |voldemort|star wars|vader|
 |tolkien|voldemort|rowling|
 
+## How to run the evaluation suite
 
+``` shell
+python3 eval_set_expansion.py eval_data/cat_eval_data/nfl-teams
+
+python3 eval_analogy.py eval_data/analogy_eval_data/questions-words.txt
+```
 
 
 
