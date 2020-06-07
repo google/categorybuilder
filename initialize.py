@@ -18,7 +18,4 @@
 import category_builder_util as util
 
 if __name__ == "__main__":
-  util.create_db(data_dir=".")
-
-
-
+    util.create_db(data_dir=".")

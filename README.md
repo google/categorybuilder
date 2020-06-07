@@ -17,7 +17,7 @@ git lfs pull
 
 ## Initialization
 
-_Note: This will take a few minutes to initalize. An sqlite database of about 5.2 GB is produced._
+_Note: This will take a few minutes to initalize. An sqlite database of about 5.7 GB is produced._
 
 _Note: The initialization uses alive_progress to show progress. You can get it by 'pip3 install alive_progress'._
 

@@ -46,11 +46,67 @@ def process_bz2file_into_db(infile, table_name, cursor, connection, expected_siz
                 if line_num % 100 == 0:
                     connection.commit()
                 bar()
+    connection.commit()
+
+
+def add_c_relations_as_i_to_f(data_dir):
+    """The CB paper was optimized for size. For CBC, we need the map available from i_to_f as well."""
+    connection = sqlite3.connect(os.path.join(data_dir, SQLITE3_DB))
+    cursor = connection.cursor()
+
+    f_to_i_input = os.path.join(data_dir, F_TO_I_INPUT)
+    item_to_features = defaultdict(list)
+    with bz2.BZ2File(f_to_i_input) as f:
+        csv_reader = csv.reader(map((lambda x: x.decode('utf-8')), f))
+        line_num = 0
+        with alive_bar(1148327) as bar:
+            for line in csv_reader:
+                line_num += 1
+                if len(line) % 2 == 0:
+                    print(f'Malformed line: >>{line}<<')
+                feature = line[0]
+                if feature.startswith("S"):
+                    bar()
+                    continue
+                iterators = [iter(line[1:])] * 2
+                grouped = [(p[0], int(p[1]))
+                           for p in itertools.zip_longest(*iterators)]
+
+                item_dict = dict(grouped)
+                for item, wt in item_dict.items():
+                    item_to_features[item].append((feature, int(wt)))
+                bar()
+    cursor.execute(f'CREATE TABLE I_TO_F_C (item text, features text)')
+    connection.commit()
+
+    lines_num = 0
+    with alive_bar(len(item_to_features)) as bar:
+        for item, features in item_to_features.items():
+            features_sorted = sorted(features,
+                                     key=lambda x: -x[1])
+            row_to_write = []
+            for f, wt in features_sorted:
+                row_to_write.append(f)
+                row_to_write.append(str(wt))
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(row_to_write)
+            key, rest = item, output.getvalue()
+            cursor.execute(f"insert into I_TO_F_C values (?, ?)", (key, rest.strip()))
+            line_num += 1
+            if line_num % 100 == 0:
+                connection.commit()
+            bar()
+    connection.commit()
+
+    print(f"Creating indices.")
+    cursor.execute(f'CREATE INDEX I_TO_F_C_IDX ON I_TO_F_C (item)')
+    connection.commit()
 
 
 def create_db(data_dir, verbose=False):
     """Convert a pair of CSV files to a sqlite3 database.
-  
+
       This is a no-op if outfile exists.
     """
     db_path = os.path.join(data_dir, SQLITE3_DB)
@@ -71,15 +127,18 @@ def create_db(data_dir, verbose=False):
     connection.commit()
 
     print("INITIALIZING. ONLY DONE ONCE, WILL TAKE A FEW MINUTES.")
-    print(f"Creating table 1 of 2: item-to-feature matrix.")
+    print(f"Creating table 1 of 3: item-to-feature matrix.")
     process_bz2file_into_db(i_to_f_input, 'I_TO_F', cursor, connection, expected_size=192049)
-    print(f"Creating table 2 of 2: feature-to-item matrix.")
+    print(f"Creating table 2 of 3: feature-to-item matrix.")
     process_bz2file_into_db(f_to_i_input, 'F_TO_I', cursor, connection, expected_size=1148327)
 
     print(f"Creating indices.")
     cursor.execute(f'CREATE INDEX I_TO_F_IDX ON I_TO_F (item)')
     cursor.execute(f'CREATE INDEX F_TO_I_IDX ON F_TO_I (feature)')
     connection.commit()
+
+    print(f"Creating table 3 of 3: item-to-feature matrix (contextual).")
+    add_c_relations_as_i_to_f(data_dir=data_dir)
 
 
 def get_row(cursor, table_name, field_name, key):
@@ -182,3 +241,14 @@ class CategoryBuilder(object):
         things_like_b = self.ExpandCategory(seeds=[b, ], rho=1, n=semantic_n)
         things_cooccuring_with_c = self.GetCooccurringItems(seed=c)
         return MergeScores(things_like_b, things_cooccuring_with_c, squash=squash)
+
+    def GetSyntacticFeaturesForItem(self, item):
+        syntactic_features = get_row(self.cursor, 'I_TO_F', 'item', item)
+        # Due to a bad design choice, there may be a single contextual feature here, with wt 100.
+        return dict((k, v) for (k, v) in syntactic_features.items() if k.startswith('S'))
+
+    def GetContextualFeaturesForItem(self, item):
+        return get_row(self.cursor, 'I_TO_F_C', 'item', item)
+
+    def GetItemsForFeature(self, feature):
+        return get_row(self.cursor, 'F_TO_I', 'feature', feature)
